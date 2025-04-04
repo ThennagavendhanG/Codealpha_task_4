@@ -1,0 +1,169 @@
+Step 1: Install Snort
+
+
+
+For Ubuntu/Debian-based Systems:
+
+1.Update and install dependencies:
+
+
+
+Bash:
+
+sudo apt update && sudo apt upgrade -y
+
+sudo apt install snort -y
+
+
+
+2.Check the installed Snort version:
+
+
+
+Bash:
+
+snort -V
+
+
+
+For CentOS/RHEL-based Systems:
+
+
+
+Bash:
+
+sudo yum install snort -y
+
+
+
+
+
+Step 2: Configure Snort
+
+1.Find your network interface:
+
+
+
+Bash:
+
+ip a  # Look for an active network interface (e.g., eth0, wlan0)
+
+
+
+2.Edit the Snort configuration file:
+
+
+
+Bash:
+
+sudo nano /etc/snort/snort.conf
+
+
+
+Set HOME_NET to match your network (e.g., 192.168.1.0/24):
+
+
+
+nginx:
+
+ipvar HOME_NET 192.168.1.0/24
+
+
+
+Enable output logging:
+
+
+
+lua:
+
+output alert_fast: alert.log
+
+
+
+
+
+Step 3: Add Custom Rules
+
+Snort detects intrusions using rules. Let’s create a rule to detect ping (ICMP) scans.
+
+
+
+1.Open the rules file:
+
+
+
+Bash:
+
+sudo nano /etc/snort/rules/local.rules
+
+
+
+2.Add the following rule to detect ICMP ping sweeps:
+
+
+
+php:
+
+alert icmp any any -> $HOME_NET any (msg:"ICMP Ping Detected"; sid:1000001; rev:1;)
+
+3.Save and exit.
+
+
+
+
+
+Step 4: Run Snort in IDS Mode
+
+Now, start Snort to monitor network traffic:
+
+
+
+Bash:
+
+sudo snort -A console -q -c /etc/snort/snort.conf -i eth0
+
+
+
+-A console: Shows alerts on the terminal
+
+-q: Runs in quiet mode
+
+-c: Loads the Snort config
+
+
+
+-i eth0 → Monitors traffic on eth0 (replace with your interface)
+
+
+
+
+
+Step 5: Test Detection
+
+To check if Snort detects suspicious activity, open another terminal and ping your machine:
+
+
+
+Bash:
+
+ping -c 3 192.168.1.10  # Replace with Snort’s IP
+
+
+
+If everything is set up correctly, you’ll see Snort triggering an ICMP Ping Detected alert.
+
+
+
+
+
+Step 6: Visualize Alerts (Optional)
+
+For better analysis, you can:
+
+
+
+i)Use Snorby, Base, or Kibana to visualize alerts.
+
+
+
+ii)Install ELK (Elasticsearch, Logstash, Kibana) to collect and analyze Snort logs.
